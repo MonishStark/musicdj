@@ -1,0 +1,66 @@
+# Production Requirements for AI Remixer
+# Minimal set of dependencies for production deployment
+# Based on requirements.txt but optimized for production
+
+# Core audio processing (essential only)
+librosa==0.11.0
+numpy==1.23.5
+scipy==1.15.2
+soundfile==0.13.1
+audioread==3.0.1
+pydub==0.25.1
+
+# Beat detection and audio analysis
+madmom==0.16.1
+
+# Audio source separation
+spleeter==2.4.0
+norbert==0.2.1
+
+# Machine Learning (TensorFlow stack)
+tensorflow==2.9.3
+tensorflow-estimator==2.9.0
+keras==2.9.0
+scikit-learn==1.6.1
+
+# Performance critical dependencies
+numba==0.61.2
+llvmlite==0.44.0
+joblib==1.4.2
+
+# FFmpeg integration
+ffmpeg-python==0.2.0
+
+# Essential utilities
+pandas==1.5.3
+decorator==5.2.1
+
+# Networking for model downloads
+requests==2.32.3
+urllib3==2.4.0
+certifi==2025.4.26
+
+# TensorFlow dependencies (required)
+protobuf==3.19.6
+grpcio==1.71.0
+absl-py==2.2.2
+h5py==3.13.0
+wrapt==1.17.2
+
+# Audio codec support
+soxr==0.5.0.post1
+
+# System utilities (minimal)
+packaging==25.0
+six==1.17.0
+typing_extensions==4.13.2
+
+# Security
+rsa==4.9.1
+cachetools==5.5.2
+
+# Production notes:
+# - Exclude development tools, testing frameworks, and debugging utilities
+# - Use minimal TensorFlow dependencies
+# - Optimize for smaller container size and faster deployment
+# - Regularly update for security patches

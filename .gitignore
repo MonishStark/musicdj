@@ -14,3 +14,9 @@ __pycache__/
 # Output directories
 uploads/
 results/
+
+# Log files and audit logs
+logs/*.log
+logs/*.old
+logs/audit.*
+*.log
