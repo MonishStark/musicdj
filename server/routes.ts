@@ -306,7 +306,7 @@ class AuditLogger {
 	public async logSecurityViolation(
 		req: Request,
 		violationType: AuditEventType,
-		details: Record<string, any>
+		details: AuditEventDetails
 	): Promise<void> {
 		await this.log(violationType, AuditSeverity.HIGH, "FAILURE", details, req);
 	}
@@ -315,7 +315,7 @@ class AuditLogger {
 		trackId: number,
 		eventType: AuditEventType,
 		outcome: "SUCCESS" | "FAILURE",
-		details: Record<string, any> = {}
+		details: AuditEventDetails = {}
 	): Promise<void> {
 		await this.log(
 			eventType,
@@ -327,7 +327,7 @@ class AuditLogger {
 
 	public async logSystemEvent(
 		eventType: AuditEventType,
-		details: Record<string, any> = {}
+		details: AuditEventDetails = {}
 	): Promise<void> {
 		await this.log(eventType, AuditSeverity.MEDIUM, "SUCCESS", details);
 	}
