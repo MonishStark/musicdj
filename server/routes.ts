@@ -68,6 +68,45 @@ enum AuditSeverity {
 	CRITICAL = "CRITICAL",
 }
 
+interface AuditEventDetails {
+	// File operation details
+	fileName?: string;
+	filePath?: string;
+	fileSize?: number;
+	fileType?: string;
+	uploadId?: string;
+
+	// Processing details
+	processingTime?: number;
+	algorithm?: string;
+	settings?: ProcessingSettings;
+	errorMessage?: string;
+
+	// Security details
+	pathTraversalAttempt?: string;
+	maliciousPattern?: string;
+	validationError?: string;
+
+	// Request details
+	endpoint?: string;
+	method?: string;
+	statusCode?: number;
+	responseTime?: number;
+
+	// Additional context (for any truly unknown properties)
+	[key: string]: unknown;
+}
+
+interface ProcessingSettings {
+	introLength: number;
+	outroLength: number;
+	preserveVocals: boolean;
+	beatDetection: string;
+	algorithm?: string;
+	tempo?: number;
+	key?: string;
+}
+
 interface AuditEvent {
 	timestamp: string;
 	eventType: AuditEventType;
@@ -79,7 +118,7 @@ interface AuditEvent {
 	resource?: string;
 	action?: string;
 	outcome: "SUCCESS" | "FAILURE";
-	details: Record<string, any>;
+	details: AuditEventDetails;
 	requestId?: string;
 }
 
@@ -135,7 +174,9 @@ class AuditLogger {
 		return Date.now().toString(36) + Math.random().toString(36).substr(2);
 	}
 
-	private sanitizeForLogging(data: any): any {
+	private sanitizeForLogging(
+		data: Record<string, unknown>
+	): Record<string, unknown> {
 		const sanitized = { ...data };
 
 		// Remove or mask sensitive information
@@ -147,14 +188,15 @@ class AuditLogger {
 		}
 
 		// Limit file path exposure
-		if (sanitized.filePath) {
+		if (sanitized.filePath && typeof sanitized.filePath === "string") {
 			sanitized.filePath = path.basename(sanitized.filePath);
 		}
 
 		// Truncate long strings
 		Object.keys(sanitized).forEach((key) => {
-			if (typeof sanitized[key] === "string" && sanitized[key].length > 500) {
-				sanitized[key] = sanitized[key].substring(0, 500) + "...[TRUNCATED]";
+			const value = sanitized[key];
+			if (typeof value === "string" && value.length > 500) {
+				sanitized[key] = value.substring(0, 500) + "...[TRUNCATED]";
 			}
 		});
 
@@ -200,7 +242,7 @@ class AuditLogger {
 		eventType: AuditEventType,
 		severity: AuditSeverity,
 		outcome: "SUCCESS" | "FAILURE",
-		details: Record<string, any> = {},
+		details: AuditEventDetails = {},
 		req?: Request,
 		userId?: string | number
 	): Promise<void> {
@@ -503,26 +545,35 @@ const upload = multer({
  * @param settings - Processing settings to validate
  * @returns Validated settings or null if invalid
  */
-function validateProcessingSettings(settings: any): any | null {
+function validateProcessingSettings(
+	settings: unknown
+): ProcessingSettings | null {
 	try {
+		// Type guard to ensure settings is an object
+		if (!settings || typeof settings !== "object") {
+			return null;
+		}
+
+		const settingsObj = settings as Record<string, unknown>;
+
 		// Validate intro length (1-64 bars)
-		const introLength = parseInt(String(settings.introLength), 10);
+		const introLength = parseInt(String(settingsObj.introLength), 10);
 		if (isNaN(introLength) || introLength < 1 || introLength > 64) {
 			return null;
 		}
 
 		// Validate outro length (1-64 bars)
-		const outroLength = parseInt(String(settings.outroLength), 10);
+		const outroLength = parseInt(String(settingsObj.outroLength), 10);
 		if (isNaN(outroLength) || outroLength < 1 || outroLength > 64) {
 			return null;
 		}
 
 		// Validate preserve vocals boolean
-		const preserveVocals = Boolean(settings.preserveVocals);
+		const preserveVocals = Boolean(settingsObj.preserveVocals);
 
 		// Validate beat detection method
 		const allowedMethods = ["auto", "librosa", "madmom"];
-		const beatDetection = String(settings.beatDetection).toLowerCase();
+		const beatDetection = String(settingsObj.beatDetection).toLowerCase();
 		if (!allowedMethods.includes(beatDetection)) {
 			return null;
 		}
@@ -532,6 +583,13 @@ function validateProcessingSettings(settings: any): any | null {
 			outroLength,
 			preserveVocals,
 			beatDetection,
+			algorithm:
+				typeof settingsObj.algorithm === "string"
+					? settingsObj.algorithm
+					: undefined,
+			tempo:
+				typeof settingsObj.tempo === "number" ? settingsObj.tempo : undefined,
+			key: typeof settingsObj.key === "string" ? settingsObj.key : undefined,
 		};
 	} catch (error) {
 		console.error("Settings validation error:", error);
