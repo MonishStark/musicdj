@@ -159,7 +159,7 @@ class AuditLogManager {
 
 			// Display critical events
 			if (securityEvents.length > 0) {
-				console.log(`\n=== Critical Security Events ===`);
+				console.log("\n=== Critical Security Events ===");
 				securityEvents.slice(0, 10).forEach((event, index) => {
 					console.log(`\n${index + 1}. ${event.eventType} (${event.severity})`);
 					console.log(`   Time: ${event.timestamp}`);
