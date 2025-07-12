@@ -152,7 +152,7 @@ const testCases = [
 ];
 
 async function runAuditTests() {
-	console.log("🔍 Starting Audit Logging Tests...\n");
+	
 
 	try {
 		// Import the AuditLogger class dynamically
@@ -258,23 +258,23 @@ async function runAuditTests() {
 
 		// Run each test case
 		for (const testCase of testCases) {
-			console.log(`\n📝 Testing: ${testCase.name}`);
+			
 			try {
 				await testCase.test(AuditLogger);
-				console.log(`✅ ${testCase.name} - PASSED`);
+				
 			} catch (error) {
 				console.error(`❌ ${testCase.name} - FAILED:`, error.message);
 			}
 		}
 
-		console.log("\n🎉 Audit logging tests completed!");
+		
 
 		// Show log file info
 		if (fs.existsSync(process.env.AUDIT_LOG_FILE)) {
 			const stats = fs.statSync(process.env.AUDIT_LOG_FILE);
-			console.log(`\n📊 Test log file created: ${process.env.AUDIT_LOG_FILE}`);
-			console.log(`📦 File size: ${stats.size} bytes`);
-			console.log(`📅 Created: ${stats.birthtime.toLocaleString()}`);
+			
+			
+			
 		}
 	} catch (error) {
 		console.error("❌ Test failed:", error);

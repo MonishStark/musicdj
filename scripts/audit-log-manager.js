@@ -33,7 +33,7 @@ class AuditLogManager {
 	static async rotateLogs() {
 		try {
 			if (!fs.existsSync(AUDIT_LOG_PATH)) {
-				console.log("No audit log file found to rotate");
+				
 				return;
 			}
 
@@ -44,9 +44,9 @@ class AuditLogManager {
 			if (fileAge > maxAge) {
 				const backupPath = `${AUDIT_LOG_PATH}.${Date.now()}.old`;
 				await fs.promises.rename(AUDIT_LOG_PATH, backupPath);
-				console.log(`Log rotated: ${path.basename(backupPath)}`);
+				
 			} else {
-				console.log("Log rotation not needed yet");
+				
 			}
 		} catch (error) {
 			console.error("Failed to rotate logs:", error);
@@ -72,12 +72,12 @@ class AuditLogManager {
 					if (fileAge > maxAge) {
 						await fs.promises.unlink(filePath);
 						cleanedCount++;
-						console.log(`Deleted old log: ${file}`);
+						
 					}
 				}
 			}
 
-			console.log(`Cleanup complete: ${cleanedCount} old log files deleted`);
+			
 		} catch (error) {
 			console.error("Failed to cleanup old logs:", error);
 		}
@@ -89,7 +89,7 @@ class AuditLogManager {
 	static async analyzeSecurityEvents(hours = 24) {
 		try {
 			if (!fs.existsSync(AUDIT_LOG_PATH)) {
-				console.log("No audit log file found");
+				
 				return;
 			}
 
@@ -149,22 +149,22 @@ class AuditLogManager {
 			}
 
 			// Display summary
-			console.log(`\n=== Security Analysis (Last ${hours} hours) ===`);
-			console.log(`Total Events: ${summary.totalEvents}`);
-			console.log(`Security Violations: ${summary.securityViolations}`);
-			console.log(`Failed Access Attempts: ${summary.failedAccess}`);
-			console.log(`Suspicious Requests: ${summary.suspiciousRequests}`);
-			console.log(`Path Traversal Attempts: ${summary.pathTraversalAttempts}`);
-			console.log(`Unique IP Addresses: ${summary.uniqueIPs.size}`);
+			
+			
+			
+			
+			
+			
+			
 
 			// Display critical events
 			if (securityEvents.length > 0) {
-				console.log("\n=== Critical Security Events ===");
+				
 				securityEvents.slice(0, 10).forEach((event, index) => {
-					console.log(`\n${index + 1}. ${event.eventType} (${event.severity})`);
-					console.log(`   Time: ${event.timestamp}`);
-					console.log(`   IP: ${event.ipAddress || "unknown"}`);
-					console.log(`   Details: ${JSON.stringify(event.details, null, 2)}`);
+					
+					
+					
+					
 				});
 			}
 		} catch (error) {
@@ -177,10 +177,10 @@ class AuditLogManager {
 	 */
 	static async monitorLogs() {
 		try {
-			console.log("Monitoring audit logs (Press Ctrl+C to stop)...\n");
+			
 
 			if (!fs.existsSync(AUDIT_LOG_PATH)) {
-				console.log("Waiting for audit log file to be created...");
+				
 			}
 
 			let lastPosition = 0;
@@ -222,7 +222,7 @@ class AuditLogManager {
 			// Handle Ctrl+C
 			process.on("SIGINT", () => {
 				fs.unwatchFile(AUDIT_LOG_PATH);
-				console.log("\nMonitoring stopped");
+				
 				process.exit(0);
 			});
 		} catch (error) {
@@ -245,12 +245,10 @@ class AuditLogManager {
 		else if (event.outcome === "FAILURE") color = "\x1b[91m"; // Light Red
 		else color = "\x1b[32m"; // Green
 
-		console.log(
-			`${color}${timestamp} [${severity}] ${outcome} ${event.eventType}${ip}\x1b[0m`
-		);
+		
 
 		if (event.details && Object.keys(event.details).length > 0) {
-			console.log(`   ${JSON.stringify(event.details)}`);
+			
 		}
 	}
 
@@ -260,7 +258,7 @@ class AuditLogManager {
 	static async showStats() {
 		try {
 			if (!fs.existsSync(AUDIT_LOG_PATH)) {
-				console.log("No audit log file found");
+				
 				return;
 			}
 
@@ -271,11 +269,11 @@ class AuditLogManager {
 				.split("\n")
 				.filter((line) => line.trim());
 
-			console.log("=== Audit Log Statistics ===");
-			console.log(`File Size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
-			console.log(`Total Events: ${lines.length}`);
-			console.log(`Created: ${stats.birthtime.toLocaleString()}`);
-			console.log(`Modified: ${stats.mtime.toLocaleString()}`);
+			
+			
+			
+			
+			
 
 			// Count events by type
 			const eventTypes = {};
@@ -291,17 +289,17 @@ class AuditLogManager {
 				}
 			}
 
-			console.log("\n=== Event Types ===");
+			
 			Object.entries(eventTypes)
 				.sort(([, a], [, b]) => b - a)
 				.slice(0, 10)
 				.forEach(([type, count]) => {
-					console.log(`${type}: ${count}`);
+					
 				});
 
-			console.log("\n=== Severity Distribution ===");
+			
 			Object.entries(severities).forEach(([severity, count]) => {
-				console.log(`${severity}: ${count}`);
+				
 			});
 		} catch (error) {
 			console.error("Failed to show statistics:", error);
@@ -336,28 +334,20 @@ switch (command) {
 		break;
 
 	default:
-		console.log("Audit Log Management Utility");
-		console.log("");
-		console.log("Usage: node audit-log-manager.js <command> [options]");
-		console.log("");
-		console.log("Commands:");
-		console.log(
-			"  rotate              Rotate log files based on retention policy"
-		);
-		console.log("  cleanup             Clean up old log files");
-		console.log(
-			"  analyze [hours]     Analyze security events (default: 24 hours)"
-		);
-		console.log("  monitor             Monitor logs in real-time");
-		console.log("  stats               Show log file statistics");
-		console.log("");
-		console.log("Examples:");
-		console.log(
-			"  node audit-log-manager.js analyze 48   # Analyze last 48 hours"
-		);
-		console.log(
-			"  node audit-log-manager.js monitor      # Real-time monitoring"
-		);
-		console.log("  node audit-log-manager.js cleanup      # Clean old logs");
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		break;
 }
