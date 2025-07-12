@@ -344,7 +344,7 @@ class AuditLogger {
 			if (fileAge > maxAge) {
 				const backupPath = `${AUDIT_CONFIG.LOG_FILE_PATH}.${Date.now()}.old`;
 				await fs.promises.rename(AUDIT_CONFIG.LOG_FILE_PATH, backupPath);
-				console.log(`Audit log rotated to: ${backupPath}`);
+				
 			}
 		} catch (error) {
 			console.error("Failed to cleanup old audit logs:", error);
