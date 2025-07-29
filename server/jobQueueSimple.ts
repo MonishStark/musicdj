@@ -195,11 +195,11 @@ class SimpleJobQueueManager {
 
 			// Determine which Python script to use
 			const scriptName = data.useOptimization
-				? "audioProcessor_optimized.py"
+				? "audioProcessor.py"
 				: "audioProcessor.py";
 			const scriptPath = path.join(__dirname, scriptName);
 
-			// Check if optimized script exists, fallback to regular if not
+			// Check if script exists, fallback to regular if not
 			const finalScriptPath = fs.existsSync(scriptPath)
 				? scriptPath
 				: path.join(__dirname, "audioProcessor.py");
