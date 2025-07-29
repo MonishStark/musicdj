@@ -178,8 +178,8 @@ app.use((req, res, next) => {
 		},
 		() => {
 			log(`serving on port ${port}`);
-			log(`Server running in simple mode (no Redis required)`);
-			log(`Job queue active with direct processing`);
+			log("Server running in simple mode (no Redis required)");
+			log("Job queue active with direct processing");
 		}
 	);
 

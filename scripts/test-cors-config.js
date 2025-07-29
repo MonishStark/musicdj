@@ -53,7 +53,7 @@ async function testCorsOrigin(origin) {
 				),
 			};
 
-			console.log(`   CORS Headers:`, corsHeaders);
+			console.log("   CORS Headers:", corsHeaders);
 
 			// Test actual request
 			const actualResponse = await fetch(`${BASE_URL}/api/tracks`, {
@@ -75,7 +75,7 @@ async function testCorsOrigin(origin) {
 }
 
 async function testRateLimiting() {
-	console.log(`\n🚦 Testing Rate Limiting...`);
+	console.log("\n🚦 Testing Rate Limiting...");
 
 	const requests = [];
 	for (let i = 0; i < 5; i++) {
@@ -100,14 +100,14 @@ async function testRateLimiting() {
 			console.log(`   Rate limit remaining: ${rateLimitHeaders}`);
 		}
 
-		console.log(`   ✅ Rate limiting is working`);
+		console.log("   ✅ Rate limiting is working");
 	} catch (error) {
-		console.log(`   ⚠️  Error testing rate limiting:`, error.message);
+		console.log("   ⚠️  Error testing rate limiting:", error.message);
 	}
 }
 
 async function testSecurityHeaders() {
-	console.log(`\n🛡️  Testing Security Headers...`);
+	console.log("\n🛡️  Testing Security Headers...");
 
 	try {
 		const response = await fetch(`${BASE_URL}/api/tracks`, {
@@ -130,19 +130,19 @@ async function testSecurityHeaders() {
 			"Referrer-Policy": response.headers.get("Referrer-Policy"),
 		};
 
-		console.log(`   Security Headers:`, securityHeaders);
+		console.log("   Security Headers:", securityHeaders);
 
 		const missingHeaders = Object.entries(securityHeaders)
 			.filter(([key, value]) => !value)
 			.map(([key]) => key);
 
 		if (missingHeaders.length === 0) {
-			console.log(`   ✅ All security headers are present`);
+			console.log("   ✅ All security headers are present");
 		} else {
 			console.log(`   ⚠️  Missing headers: ${missingHeaders.join(", ")}`);
 		}
 	} catch (error) {
-		console.log(`   ⚠️  Error testing security headers:`, error.message);
+		console.log("   ⚠️  Error testing security headers:", error.message);
 	}
 }
 
