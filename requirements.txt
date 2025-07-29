@@ -1,0 +1,42 @@
+# Memory-Optimized Python Audio Processing Requirements
+# Updated requirements for the Music DJ Feature application
+
+# Core audio processing libraries
+librosa>=0.10.0  # Audio analysis and processing
+pydub>=0.25.1    # Audio manipulation and format conversion
+numpy>=1.21.0    # Numerical computing with memory optimization
+scipy>=1.9.0     # Scientific computing for audio algorithms
+
+# AI/ML audio processing
+spleeter>=2.3.0   # Audio source separation
+madmom>=0.16.1    # Advanced audio processing algorithms
+tensorflow>=2.8.0,<2.13.0  # Required by spleeter (pinned for compatibility)
+
+# System monitoring and optimization
+psutil>=5.9.0     # Process and system monitoring for memory optimization
+memory-profiler>=0.60.0  # Memory usage profiling (optional)
+
+# Audio codec support
+ffmpeg-python>=0.2.0  # FFmpeg integration for format support
+
+# Utility libraries
+python-shell>=1.0.0    # For Node.js integration
+tqdm>=4.64.0           # Progress bars for long operations
+colorlog>=6.7.0        # Enhanced logging with colors
+
+# Optional performance boosters
+numba>=0.56.0          # JIT compilation for numpy operations (optional)
+cython>=0.29.0         # C extensions compilation (optional)
+
+# Development and testing dependencies (install with: pip install -r requirements.txt[dev])
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# pytest-cov>=4.0.0
+# black>=23.0.0
+# flake8>=6.0.0
+# mypy>=1.0.0
+
+# Azure/Cloud deployment dependencies
+# azure-storage-blob>=12.14.0  # For Azure Blob Storage integration
+# azure-identity>=1.12.0       # For Azure authentication
+# azure-keyvault-secrets>=4.6.0  # For secure configuration management

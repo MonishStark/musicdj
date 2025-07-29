@@ -1,0 +1,26 @@
+[project]
+name = "music-dj-feature-optimized"
+version = "1.0.0"
+description = "Memory-optimized Music DJ Feature application with streaming processing capabilities"
+requires-python = ">=3.8"
+dependencies = [
+    "librosa>=0.10.0",
+    "pydub>=0.25.1",
+    "numpy>=1.21.0",
+    "spleeter>=2.3.0",
+    "madmom>=0.16.1",
+    "psutil>=5.9.0",
+    "python-shell>=1.0.0"
+]
+
+[project.optional-dependencies]
+development = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0"
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
