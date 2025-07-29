@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * CORS Configuration Test Script
  *
