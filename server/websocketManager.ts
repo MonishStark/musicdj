@@ -19,6 +19,17 @@ import { Server as HTTPServer } from "http";
 import { jobQueueManager } from "./jobQueue";
 import { websocketCorsOptions } from "./cors-config";
 
+// Utility function to sanitize user input for logging
+function sanitizeForLog(input: any): string {
+	if (typeof input !== "string") {
+		input = String(input);
+	}
+	// Remove newlines, carriage returns, and control characters that could be used for log injection
+	return input
+		.replace(/[\r\n\t\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+		.substring(0, 1000);
+}
+
 /**
  * WebSocket Event Types
  */
@@ -225,11 +236,7 @@ export class WebSocketManager {
 	/**
 	 * Authenticate and register user
 	 */
-	private authenticateUser(
-		socket: any,
-		userId: number,
-		isAdmin = false
-	) {
+	private authenticateUser(socket: any, userId: number, isAdmin = false) {
 		// Remove any existing association for this socket
 		this.handleDisconnection(socket, "re-authentication");
 
@@ -287,9 +294,17 @@ export class WebSocketManager {
 				}
 			}
 
-			console.log(`User ${userId} disconnected: ${socket.id} (${reason})`);
+			console.log(
+				`User ${sanitizeForLog(userId)} disconnected: ${
+					socket.id
+				} (${sanitizeForLog(reason)})`
+			);
 		} else {
-			console.log(`Anonymous client disconnected: ${socket.id} (${reason})`);
+			console.log(
+				`Anonymous client disconnected: ${socket.id} (${sanitizeForLog(
+					reason
+				)})`
+			);
 		}
 
 		// Remove socket from connected users

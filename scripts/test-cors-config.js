@@ -14,6 +14,17 @@ import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Utility function to sanitize user input for logging
+function sanitizeForLog(input) {
+	if (typeof input !== "string") {
+		input = String(input);
+	}
+	// Remove newlines, carriage returns, and control characters that could be used for log injection
+	return input
+		.replace(/[\r\n\t\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+		.substring(0, 1000);
+}
+
 const BASE_URL = "http://localhost:5000";
 const TEST_ORIGINS = [
 	"http://localhost:3000",
@@ -25,7 +36,7 @@ const TEST_ORIGINS = [
 
 async function testCorsOrigin(origin) {
 	try {
-		console.log(`\n🧪 Testing origin: ${origin}`);
+		console.log(`\n🧪 Testing origin: ${sanitizeForLog(origin)}`);
 
 		// Test preflight request
 		const preflightResponse = await fetch(`${BASE_URL}/api/tracks`, {
@@ -37,7 +48,9 @@ async function testCorsOrigin(origin) {
 			},
 		});
 
-		console.log(`   Preflight Status: ${preflightResponse.status}`);
+		console.log(
+			`   Preflight Status: ${sanitizeForLog(preflightResponse.status)}`
+		);
 
 		if (preflightResponse.status === 200) {
 			const corsHeaders = {
@@ -63,13 +76,18 @@ async function testCorsOrigin(origin) {
 				},
 			});
 
-			console.log(`   Actual Request Status: ${actualResponse.status}`);
-			console.log(`   ✅ Origin ${origin} is ALLOWED`);
+			console.log(
+				`   Actual Request Status: ${sanitizeForLog(actualResponse.status)}`
+			);
+			console.log(`   ✅ Origin ${sanitizeForLog(origin)} is ALLOWED`);
 		} else {
-			console.log(`   ❌ Origin ${origin} is BLOCKED`);
+			console.log(`   ❌ Origin ${sanitizeForLog(origin)} is BLOCKED`);
 		}
 	} catch (error) {
-		console.log(`   ⚠️  Error testing ${origin}:`, error.message);
+		console.log(
+			`   ⚠️  Error testing ${sanitizeForLog(origin)}:`,
+			sanitizeForLog(error.message)
+		);
 	}
 }
 
@@ -96,12 +114,17 @@ async function testRateLimiting() {
 
 		const rateLimitHeaders = responses[0].headers.get("X-RateLimit-Remaining");
 		if (rateLimitHeaders) {
-			console.log(`   Rate limit remaining: ${rateLimitHeaders}`);
+			console.log(
+				`   Rate limit remaining: ${sanitizeForLog(rateLimitHeaders)}`
+			);
 		}
 
 		console.log("   ✅ Rate limiting is working");
 	} catch (error) {
-		console.log("   ⚠️  Error testing rate limiting:", error.message);
+		console.log(
+			"   ⚠️  Error testing rate limiting:",
+			sanitizeForLog(error.message)
+		);
 	}
 }
 

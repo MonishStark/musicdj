@@ -14,6 +14,17 @@ import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
 
+// Utility function to sanitize user input for logging
+function sanitizeForLog(input) {
+	if (typeof input !== "string") {
+		input = String(input);
+	}
+	// Remove newlines, carriage returns, and control characters that could be used for log injection
+	return input
+		.replace(/[\r\n\t\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+		.substring(0, 1000);
+}
+
 const BASE_URL = "http://localhost:5000";
 
 async function testStreamingUpload() {
@@ -27,9 +38,13 @@ async function testStreamingUpload() {
 		if (healthResponse.ok) {
 			const healthData = await healthResponse.json();
 			console.log("✅ Health check passed");
-			console.log(`   Status: ${healthData.status}`);
-			console.log(`   Max file size: ${healthData.limits?.maxFileSize}`);
-			console.log(`   Chunk size: ${healthData.limits?.chunkSize}`);
+			console.log(`   Status: ${sanitizeForLog(healthData.status)}`);
+			console.log(
+				`   Max file size: ${sanitizeForLog(healthData.limits?.maxFileSize)}`
+			);
+			console.log(
+				`   Chunk size: ${sanitizeForLog(healthData.limits?.chunkSize)}`
+			);
 		} else {
 			console.log("❌ Health check failed");
 			return;
@@ -50,13 +65,17 @@ async function testStreamingUpload() {
 		if (initResponse.ok) {
 			const initData = await initResponse.json();
 			console.log("✅ Upload initialization passed");
-			console.log(`   Upload ID: ${initData.uploadId}`);
+			console.log(`   Upload ID: ${sanitizeForLog(initData.uploadId)}`);
 			console.log(
-				`   Max file size: ${Math.round(
-					initData.maxFileSize / (1024 * 1024)
+				`   Max file size: ${sanitizeForLog(
+					Math.round(initData.maxFileSize / (1024 * 1024))
 				)}MB`
 			);
-			console.log(`   Chunk size: ${Math.round(initData.chunkSize / 1024)}KB`);
+			console.log(
+				`   Chunk size: ${sanitizeForLog(
+					Math.round(initData.chunkSize / 1024)
+				)}KB`
+			);
 
 			// Test 3: Progress Tracking
 			console.log("\n3. Testing progress tracking...");
@@ -67,8 +86,8 @@ async function testStreamingUpload() {
 			if (progressResponse.ok) {
 				const progressData = await progressResponse.json();
 				console.log("✅ Progress tracking passed");
-				console.log(`   Status: ${progressData.status}`);
-				console.log(`   Filename: ${progressData.filename}`);
+				console.log(`   Status: ${sanitizeForLog(progressData.status)}`);
+				console.log(`   Filename: ${sanitizeForLog(progressData.filename)}`);
 			} else {
 				console.log("❌ Progress tracking failed");
 			}
@@ -82,7 +101,7 @@ async function testStreamingUpload() {
 			if (activeResponse.ok) {
 				const activeData = await activeResponse.json();
 				console.log("✅ Active uploads endpoint passed");
-				console.log(`   Active uploads: ${activeData.count}`);
+				console.log(`   Active uploads: ${sanitizeForLog(activeData.count)}`);
 			} else {
 				console.log("❌ Active uploads endpoint failed");
 			}
@@ -104,10 +123,10 @@ async function testStreamingUpload() {
 		} else {
 			console.log("❌ Upload initialization failed");
 			const errorData = await initResponse.json();
-			console.log(`   Error: ${errorData.message}`);
+			console.log(`   Error: ${sanitizeForLog(errorData.message)}`);
 		}
 	} catch (error) {
-		console.log(`❌ Test failed with error: ${error.message}`);
+		console.log(`❌ Test failed with error: ${sanitizeForLog(error.message)}`);
 		console.log("   Make sure the server is running on http://localhost:5000");
 	}
 
@@ -133,12 +152,14 @@ async function testFileSizeValidation() {
 		if (response.status === 413) {
 			console.log("✅ File size validation working correctly");
 			const errorData = await response.json();
-			console.log(`   Error message: ${errorData.message}`);
+			console.log(`   Error message: ${sanitizeForLog(errorData.message)}`);
 		} else {
 			console.log("❌ File size validation not working properly");
 		}
 	} catch (error) {
-		console.log(`❌ File size validation test failed: ${error.message}`);
+		console.log(
+			`❌ File size validation test failed: ${sanitizeForLog(error.message)}`
+		);
 	}
 }
 
@@ -161,12 +182,14 @@ async function testFileFormatValidation() {
 		if (response.status === 400) {
 			console.log("✅ File format validation working correctly");
 			const errorData = await response.json();
-			console.log(`   Error message: ${errorData.message}`);
+			console.log(`   Error message: ${sanitizeForLog(errorData.message)}`);
 		} else {
 			console.log("❌ File format validation not working properly");
 		}
 	} catch (error) {
-		console.log(`❌ File format validation test failed: ${error.message}`);
+		console.log(
+			`❌ File format validation test failed: ${sanitizeForLog(error.message)}`
+		);
 	}
 }
 
@@ -210,7 +233,9 @@ async function performanceBenchmark() {
 				console.log(`❌ ${test.name} initialization failed`);
 			}
 		} catch (error) {
-			console.log(`❌ ${test.name} benchmark failed: ${error.message}`);
+			console.log(
+				`❌ ${test.name} benchmark failed: ${sanitizeForLog(error.message)}`
+			);
 		}
 	}
 }

@@ -13,6 +13,17 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
+// Utility function to sanitize user input for logging
+function sanitizeForLog(input: any): string {
+	if (typeof input !== "string") {
+		input = String(input);
+	}
+	// Remove newlines, carriage returns, and control characters that could be used for log injection
+	return input
+		.replace(/[\r\n\t\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+		.substring(0, 1000);
+}
+
 // Job priority levels
 export enum JobPriority {
 	LOW = 1,
@@ -132,7 +143,7 @@ class SimpleJobQueueManager {
 		if (job && job.status === JobStatus.ACTIVE) {
 			job.status = JobStatus.FAILED;
 			job.error = "Cancelled by user";
-			console.log(`🚫 Job ${jobId} marked as cancelled`);
+			console.log(`🚫 Job ${sanitizeForLog(jobId)} marked as cancelled`);
 			return true;
 		}
 		return false;
@@ -250,10 +261,16 @@ class SimpleJobQueueManager {
 				job.status = JobStatus.COMPLETED;
 			}
 
-			console.log(`✅ Direct processing completed for track ${data.trackId}`);
+			console.log(
+				`✅ Direct processing completed for track ${sanitizeForLog(
+					data.trackId
+				)}`
+			);
 		} catch (error) {
 			console.error(
-				`❌ Direct processing failed for track ${data.trackId}:`,
+				`❌ Direct processing failed for track ${sanitizeForLog(
+					data.trackId
+				)}:`,
 				error
 			);
 
@@ -458,7 +475,9 @@ class SimpleJobQueueManager {
 		type: string,
 		message: string
 	): Promise<string> {
-		console.log(`📢 Notification (${type}): ${message}`);
+		console.log(
+			`📢 Notification (${sanitizeForLog(type)}): ${sanitizeForLog(message)}`
+		);
 		return "notification-" + Date.now();
 	}
 
