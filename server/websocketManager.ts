@@ -228,7 +228,7 @@ export class WebSocketManager {
 	private authenticateUser(
 		socket: any,
 		userId: number,
-		isAdmin: boolean = false
+		isAdmin = false
 	) {
 		// Remove any existing association for this socket
 		this.handleDisconnection(socket, "re-authentication");
