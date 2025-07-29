@@ -282,8 +282,6 @@ analyze_audio_file = analyze_audio_file_integrated
 process_audio = process_audio_integrated
 
 if __name__ == "__main__":
-    # CLI for testing and status checking
-    import sys
     
     if len(sys.argv) > 1:
         command = sys.argv[1]
