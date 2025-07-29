@@ -16,7 +16,7 @@
 
 import { Server as SocketIOServer } from "socket.io";
 import { Server as HTTPServer } from "http";
-import { jobQueueManager } from "./jobQueue";
+import { jobQueueManager } from "./jobQueueSimple";
 import { websocketCorsOptions } from "./cors-config";
 
 // Utility function to sanitize user input for logging

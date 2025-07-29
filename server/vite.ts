@@ -10,8 +10,8 @@ import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
 
-export function log(message: string, source = "express") {
-	const formattedTime = new Date().toLocaleTimeString("en-US", {
+export function log(_message: string, _source = "express") {
+	const _formattedTime = new Date().toLocaleTimeString("en-US", {
 		hour: "numeric",
 		minute: "2-digit",
 		second: "2-digit",
