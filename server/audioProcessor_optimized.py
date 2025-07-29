@@ -33,8 +33,6 @@ import gc
 import shutil
 from typing import Optional, Dict, Any, Tuple, List
 from contextlib import contextmanager
-import threading
-from concurrent.futures import ThreadPoolExecutor
 import psutil
 
 logging.basicConfig(level=logging.INFO,

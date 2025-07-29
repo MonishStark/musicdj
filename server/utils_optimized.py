@@ -19,7 +19,6 @@ import logging
 import gc
 import os
 from typing import Optional, Dict, Any, Tuple
-import tempfile
 from contextlib import contextmanager
 
 import librosa
