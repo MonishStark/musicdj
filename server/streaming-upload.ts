@@ -529,11 +529,9 @@ export function handleStreamingErrors() {
 }
 
 // Type augmentation for Express Request
-declare global {
-	namespace Express {
-		interface Request {
-			uploadId?: string;
-			uploadFilename?: string;
-		}
+declare module "express-serve-static-core" {
+	interface Request {
+		uploadId?: string;
+		uploadFilename?: string;
 	}
 }
