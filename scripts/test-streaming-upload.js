@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Streaming Upload Test Script
  *

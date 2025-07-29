@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Database migration runner for applying indexes and optimizations
  * Run this script to apply database optimizations to the audio_tracks table
