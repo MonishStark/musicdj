@@ -13,6 +13,7 @@ import {
 } from "./security-middleware";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { InputSanitizer } from "./security-utils.js";
 
 // Use simple job queue by default (no Redis dependency)
 import { jobQueueManager } from "./jobQueueSimple";
@@ -89,7 +90,17 @@ app.use((req, res, next) => {
 
 	app.post("/api/tracks/:id/process-async", async (req, res) => {
 		try {
-			const trackId = parseInt(req.params.id);
+			// Enhanced security: Validate and sanitize ID parameter
+			const trackId = InputSanitizer.sanitizeIntParam(
+				req.params.id,
+				1,
+				Number.MAX_SAFE_INTEGER
+			);
+			if (trackId === null) {
+				return res.status(400).json({
+					message: "Invalid track ID: must be a positive integer",
+				});
+			}
 			const settings = req.body;
 
 			// Generate job ID

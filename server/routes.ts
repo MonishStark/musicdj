@@ -12,12 +12,22 @@ import path from "path";
 import fs from "fs";
 import { PythonShell } from "python-shell";
 import streamingRoutes from "./streaming-routes.js";
+import {
+	SecurePathValidator,
+	InputSanitizer,
+	createSecurityMiddleware,
+} from "./security-utils.js";
 
 // Setup multer for file uploads with proper validation
 const uploadsDir =
 	process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads");
 const resultDir =
 	process.env.RESULTS_DIR || path.join(process.cwd(), "results");
+
+// Initialize security components
+const allowedDirectories = [uploadsDir, resultDir];
+const secureValidator = new SecurePathValidator(allowedDirectories);
+const securityMiddleware = createSecurityMiddleware(secureValidator);
 
 // Security: Validate and canonicalize directory paths to prevent malicious paths
 let normalizedUploadsDir: string;
@@ -287,9 +297,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 	// Get a specific track
 	app.get("/api/tracks/:id", async (req: Request, res: Response) => {
 		try {
-			const id = parseInt(req.params.id, 10);
-			if (isNaN(id)) {
-				return res.status(400).json({ message: "Invalid track ID" });
+			// Enhanced security: Validate and sanitize ID parameter
+			const id = InputSanitizer.sanitizeIntParam(
+				req.params.id,
+				1,
+				Number.MAX_SAFE_INTEGER
+			);
+			if (id === null) {
+				return res.status(400).json({
+					message: "Invalid track ID: must be a positive integer",
+				});
 			}
 
 			const track = await storage.getAudioTrack(id);
@@ -375,9 +392,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 	// Process a track to create extended version
 	app.post("/api/tracks/:id/process", async (req: Request, res: Response) => {
 		try {
-			const id = parseInt(req.params.id, 10);
-			if (isNaN(id)) {
-				return res.status(400).json({ message: "Invalid track ID" });
+			// Enhanced security: Validate and sanitize ID parameter
+			const id = InputSanitizer.sanitizeIntParam(
+				req.params.id,
+				1,
+				Number.MAX_SAFE_INTEGER
+			);
+			if (id === null) {
+				return res.status(400).json({
+					message: "Invalid track ID: must be a positive integer",
+				});
 			}
 
 			const track = await storage.getAudioTrack(id);
@@ -514,9 +538,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 	// Get processing status
 	app.get("/api/tracks/:id/status", async (req: Request, res: Response) => {
 		try {
-			const id = parseInt(req.params.id, 10);
-			if (isNaN(id)) {
-				return res.status(400).json({ message: "Invalid track ID" });
+			// Enhanced security: Validate and sanitize ID parameter
+			const id = InputSanitizer.sanitizeIntParam(
+				req.params.id,
+				1,
+				Number.MAX_SAFE_INTEGER
+			);
+			if (id === null) {
+				return res.status(400).json({
+					message: "Invalid track ID: must be a positive integer",
+				});
 			}
 
 			const track = await storage.getAudioTrack(id);
@@ -538,13 +569,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 	// Serve audio files
 	app.get("/api/audio/:id/:type", async (req: Request, res: Response) => {
 		try {
-			const id = parseInt(req.params.id, 10);
-			if (isNaN(id)) {
-				return res.status(400).json({ message: "Invalid track ID" });
+			// Enhanced security: Validate and sanitize ID parameter
+			const id = InputSanitizer.sanitizeIntParam(
+				req.params.id,
+				1,
+				Number.MAX_SAFE_INTEGER
+			);
+			if (id === null) {
+				return res.status(400).json({
+					message: "Invalid track ID: must be a positive integer",
+				});
 			}
 
-			const type = req.params.type;
-			if (type !== "original" && type !== "extended") {
+			// Enhanced security: Validate and sanitize type parameter
+			const type = InputSanitizer.sanitizeStringParam(req.params.type, [
+				"original",
+				"extended",
+			]);
+			if (!type) {
 				return res.status(400).json({ message: "Invalid audio type" });
 			}
 
@@ -555,7 +597,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 			let filePath = track.originalPath;
 			if (type === "extended") {
-				const version = parseInt(req.query.version as string) || 0;
+				// Enhanced security: Validate version parameter
+				const version =
+					InputSanitizer.sanitizeIntParam(
+						req.query.version as string,
+						0,
+						100
+					) || 0;
 				const extendedPaths = Array.isArray(track.extendedPaths)
 					? track.extendedPaths
 					: [];
@@ -568,10 +616,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 					.json({ message: `${type} audio file not found` });
 			}
 
+			// Enhanced security: Comprehensive file path validation
+			const pathValidation = secureValidator.validatePath(filePath, "read");
+			if (!pathValidation.isValid) {
+				console.warn("Path validation failed:", pathValidation.errors);
+				return res.status(403).json({
+					message: "Access denied: Invalid file path",
+					errors: pathValidation.errors,
+				});
+			}
+
 			// Security: Validate file path contains only safe characters and extensions
 			const allowedExtensions = [".mp3", ".wav", ".flac", ".aiff"];
-			const fileExtension = path.extname(filePath).toLowerCase();
-			if (!allowedExtensions.includes(fileExtension)) {
+			if (!secureValidator.validateFileExtension(filePath, allowedExtensions)) {
 				return res.status(400).json({ message: "Invalid file type" });
 			}
 
@@ -634,9 +691,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 	// Download extended audio
 	app.get("/api/tracks/:id/download", async (req: Request, res: Response) => {
 		try {
-			const id = parseInt(req.params.id, 10);
-			if (isNaN(id)) {
-				return res.status(400).json({ message: "Invalid track ID" });
+			// Enhanced security: Validate and sanitize ID parameter
+			const id = InputSanitizer.sanitizeIntParam(
+				req.params.id,
+				1,
+				Number.MAX_SAFE_INTEGER
+			);
+			if (id === null) {
+				return res.status(400).json({
+					message: "Invalid track ID: must be a positive integer",
+				});
 			}
 
 			const track = await storage.getAudioTrack(id);
@@ -644,7 +708,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 				return res.status(404).json({ message: "Track not found" });
 			}
 
-			const version = parseInt(req.query.version as string) || 0;
+			// Enhanced security: Validate version parameter
+			const version =
+				InputSanitizer.sanitizeIntParam(req.query.version as string, 0, 100) ||
+				0;
 			const extendedPaths = Array.isArray(track.extendedPaths)
 				? track.extendedPaths
 				: [];

@@ -4,7 +4,7 @@
 # Core audio processing libraries
 librosa>=0.10.0  # Audio analysis and processing
 pydub>=0.25.1    # Audio manipulation and format conversion
-numpy>=1.21.0    # Numerical computing with memory optimization
+numpy>=1.24.0    # Numerical computing with memory optimization (required for numba compatibility)
 scipy>=1.9.0     # Scientific computing for audio algorithms
 
 # AI/ML audio processing
