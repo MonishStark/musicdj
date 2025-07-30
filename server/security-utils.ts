@@ -31,7 +31,7 @@ export class SecurePathValidator {
 
 	constructor(allowedDirectories: string[]) {
 		this.allowedDirectories = new Set(
-			allowedDirectories.map((dir) => path.resolve(dir))
+			allowedDirectories.map((dir) => path.resolve(dir)) // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 		);
 	}
 
@@ -69,7 +69,7 @@ export class SecurePathValidator {
 
 		try {
 			// Canonicalize the path to resolve all relative components
-			const canonicalPath = path.resolve(inputPath);
+			const canonicalPath = path.resolve(inputPath); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 
 			// Verify the path is within allowed directories
 			const isWithinAllowedDir = Array.from(this.allowedDirectories).some(

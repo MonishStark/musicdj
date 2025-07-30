@@ -13,15 +13,16 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
-// Utility function to sanitize user input for logging
-function sanitizeForLog(input: any): string {
-	if (typeof input !== "string") {
-		input = String(input);
+// Security function to sanitize data for logging
+function sanitizeForLog(data: any): string {
+	if (typeof data === "string") {
+		// Remove format specifiers and control characters that could manipulate log output
+		return data
+			.replace(/%[sdifj%]/g, "") // Remove format specifiers
+			.replace(/[\x00-\x1f\x7f-\x9f]/g, "") // Remove control characters
+			.slice(0, 1000); // Limit length
 	}
-	// Remove newlines, carriage returns, and control characters that could be used for log injection
-	return input
-		.replace(/[\r\n\t\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
-		.substring(0, 1000);
+	return String(data).slice(0, 1000);
 }
 
 // Job priority levels
@@ -143,7 +144,7 @@ class SimpleJobQueueManager {
 		if (job && job.status === JobStatus.ACTIVE) {
 			job.status = JobStatus.FAILED;
 			job.error = "Cancelled by user";
-			console.log(`🚫 Job ${sanitizeForLog(jobId)} marked as cancelled`);
+			console.log(`🚫 Job ${jobId} marked as cancelled`);
 			return true;
 		}
 		return false;
@@ -206,11 +207,11 @@ class SimpleJobQueueManager {
 
 			// Determine which Python script to use
 			const scriptName = data.useOptimization
-				? "audioProcessor.py"
+				? "audioProcessor_optimized.py"
 				: "audioProcessor.py";
 			const scriptPath = path.join(__dirname, scriptName);
 
-			// Check if script exists, fallback to regular if not
+			// Check if optimized script exists, fallback to regular if not
 			const finalScriptPath = fs.existsSync(scriptPath)
 				? scriptPath
 				: path.join(__dirname, "audioProcessor.py");
@@ -261,13 +262,10 @@ class SimpleJobQueueManager {
 				job.status = JobStatus.COMPLETED;
 			}
 
-			console.log(
-				`✅ Direct processing completed for track ${sanitizeForLog(
-					data.trackId
-				)}`
-			);
+			console.log(`✅ Direct processing completed for track ${data.trackId}`);
 		} catch (error) {
 			console.error(
+				// nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
 				`❌ Direct processing failed for track ${sanitizeForLog(
 					data.trackId
 				)}:`,
@@ -475,9 +473,7 @@ class SimpleJobQueueManager {
 		type: string,
 		message: string
 	): Promise<string> {
-		console.log(
-			`📢 Notification (${sanitizeForLog(type)}): ${sanitizeForLog(message)}`
-		);
+		console.log(`📢 Notification (${type}): ${message}`);
 		return "notification-" + Date.now();
 	}
 

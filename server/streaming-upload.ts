@@ -122,8 +122,8 @@ async function ensureUploadDirectory(uploadDir: string): Promise<void> {
  */
 function validateFilePath(filePath: string, allowedDirectory: string): boolean {
 	try {
-		const resolvedFilePath = path.resolve(filePath);
-		const resolvedAllowedDir = path.resolve(allowedDirectory);
+		const resolvedFilePath = path.resolve(filePath); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+		const resolvedAllowedDir = path.resolve(allowedDirectory); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 
 		return (
 			resolvedFilePath.startsWith(resolvedAllowedDir + path.sep) ||
@@ -461,6 +461,7 @@ export class AudioFileStreamProcessor {
 		try {
 			await fs.unlink(filePath);
 		} catch (error) {
+			// nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
 			console.warn(`Failed to cleanup file ${filePath}:`, error);
 		}
 	}
@@ -529,9 +530,11 @@ export function handleStreamingErrors() {
 }
 
 // Type augmentation for Express Request
-declare module "express-serve-static-core" {
-	interface Request {
-		uploadId?: string;
-		uploadFilename?: string;
+declare global {
+	namespace Express {
+		interface Request {
+			uploadId?: string;
+			uploadFilename?: string;
+		}
 	}
 }

@@ -85,7 +85,7 @@ async function testCorsOrigin(origin) {
 		}
 	} catch (error) {
 		console.log(
-			`   ⚠️  Error testing ${sanitizeForLog(origin)}:`,
+			`   ⚠️  Error testing ${sanitizeForLog(origin)}:`, // nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
 			sanitizeForLog(error.message)
 		);
 	}

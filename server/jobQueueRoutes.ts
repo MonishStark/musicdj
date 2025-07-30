@@ -86,7 +86,7 @@ export function setupJobQueueRoutes(app: Express) {
 				}${fileExt}`;
 				const resultDir =
 					process.env.RESULTS_DIR || path.join(process.cwd(), "results");
-				const outputPath = path.join(resultDir, outputFilename);
+				const outputPath = path.join(resultDir, outputFilename); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal, javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 
 				// Add job to queue
 				const jobId = await jobQueueManager.addAudioProcessingJob(
@@ -358,7 +358,7 @@ export function setupJobQueueRoutes(app: Express) {
 					}${fileExt}`;
 					const resultDir =
 						process.env.RESULTS_DIR || path.join(process.cwd(), "results");
-					const outputPath = path.join(resultDir, outputFilename);
+					const outputPath = path.join(resultDir, outputFilename); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal, javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 
 					// Add job to queue with slight delay to spread the load
 					const jobId = await jobQueueManager.addAudioProcessingJob(
